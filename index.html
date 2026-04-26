@@ -1,61 +1,695 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Photo Transform Premium</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evanns Anonyme — Dis-lui ce que tu n'oses pas</title>
+  <meta name="description" content="Envoie un message anonyme à Evanns. Personne ne saura jamais que c'est toi." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Syne:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #07070a;
+      --surface: #0e0e13;
+      --border:  #1c1c24;
+      --border2: #2a2a36;
+      --gold:    #c8a84b;
+      --gold2:   #edd98a;
+      --silver:  #9898b0;
+      --white:   #f0eee8;
+      --red:     #e05555;
+      --glow:    rgba(200,168,75,.22);
+      --r:       16px;
+    }
+
+    html { scroll-behavior: smooth; }
+
     body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(to right, #1a1a1a, #333);
-      color: white;
-      text-align: center;
-      margin: 0;
-      padding: 0;
+      background: var(--bg);
+      color: var(--white);
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      position: relative;
+      overflow-x: hidden;
+      cursor: none;
     }
-    h1 {
-      margin-top: 40px;
-      font-size: 2em;
-      color: #FFD700;
-      font-weight: bold;
+
+    #cur { position:fixed;top:0;left:0;z-index:9999;width:10px;height:10px;background:var(--gold);border-radius:50%;pointer-events:none;transition:transform .1s;mix-blend-mode:difference; }
+    #cur-ring { position:fixed;top:0;left:0;z-index:9998;width:32px;height:32px;border:1px solid rgba(200,168,75,.5);border-radius:50%;pointer-events:none;transition:transform .5s cubic-bezier(.16,1,.3,1);opacity:.6; }
+
+    .bg-grain {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+      opacity: .7;
     }
-    input[type="file"] {
-      margin-top: 20px;
-      padding: 12px;
-      background: #FFD700;
-      color: black;
-      font-weight: bold;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      transition: transform 0.2s;
+
+    .bg-glow {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background:
+        radial-gradient(ellipse 60% 50% at 50% 10%, rgba(200,168,75,.06) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 40% at 80% 80%, rgba(100,80,200,.04) 0%, transparent 70%);
     }
-    input[type="file"]:hover {
-      transform: scale(1.1);
+
+    .bg-lines {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(200,168,75,.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(200,168,75,.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
     }
-    .examples {
-      margin-top: 40px;
+
+    .wrapper {
+      position: relative; z-index: 2;
+      width: 100%; max-width: 560px;
+      display: flex; flex-direction: column; align-items: center; gap: 0;
+      animation: fadeUp .9s ease forwards;
     }
-    .examples h2 {
-      color: #FFD700;
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
-    .examples img {
-      width: 200px;
-      margin: 10px;
+
+    .site-header { text-align: center; margin-bottom: 40px; }
+
+    .logo-eyebrow {
+      font-size: .62rem;
+      letter-spacing: .5em;
+      text-transform: uppercase;
+      color: var(--gold);
+      opacity: .7;
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .logo {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 8vw, 3.4rem);
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: -.01em;
+      color: var(--white);
+    }
+
+    .logo span {
+      background: linear-gradient(135deg, var(--gold) 0%, var(--gold2) 50%, var(--gold) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-sub {
+      font-family: 'Playfair Display', serif;
+      font-style: italic;
+      font-size: clamp(.85rem, 2.5vw, 1.05rem);
+      color: var(--silver);
+      margin-top: 12px;
+      line-height: 1.6;
+      opacity: .85;
+    }
+
+    .divider {
+      width: 60px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 18px auto 0;
+    }
+
+    .card {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px 36px 36px;
+      position: relative;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(200,168,75,.05),
+        0 40px 80px rgba(0,0,0,.55),
+        inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    .card::before {
+      content: '';
+      position: absolute; top: 0; left: 15%; right: 15%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200,168,75,.6), transparent);
+    }
+
+    .card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 20%; right: 20%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(200,168,75,.2), transparent);
+    }
+
+    .counter-pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(200,168,75,.07);
+      border: 1px solid rgba(200,168,75,.18);
+      border-radius: 50px;
+      padding: 7px 16px;
+      font-size: .68rem;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+    }
+
+    .counter-dot {
+      width: 6px; height: 6px;
+      background: var(--gold);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,100% { opacity:1; transform:scale(1); }
+      50%      { opacity:.3; transform:scale(.6); }
+    }
+
+    .field-label {
+      display: block;
+      font-size: .6rem;
+      letter-spacing: .35em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 12px;
+      opacity: .8;
+    }
+
+    .msg-textarea {
+      width: 100%;
+      min-height: 160px;
+      background: rgba(255,255,255,.025);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      color: var(--white);
+      font-family: 'Syne', sans-serif;
+      font-size: .95rem;
+      line-height: 1.7;
+      padding: 18px 20px;
+      outline: none;
+      resize: vertical;
+      transition: border-color .3s, box-shadow .3s, background .3s;
+    }
+
+    .msg-textarea::placeholder { color: rgba(152,152,176,.35); font-style: italic; }
+
+    .msg-textarea:focus {
+      border-color: rgba(200,168,75,.45);
+      background: rgba(200,168,75,.03);
+      box-shadow: 0 0 0 3px rgba(200,168,75,.07), 0 0 24px rgba(200,168,75,.05);
+    }
+
+    .char-count {
+      text-align: right;
+      font-size: .65rem;
+      color: var(--silver);
+      opacity: .45;
+      margin-top: 8px;
+      letter-spacing: .05em;
+    }
+
+    .char-count.warn { color: var(--red); opacity: .8; }
+
+    .anon-badge {
+      display: flex; align-items: center; gap: 10px;
+      background: rgba(200,168,75,.05);
+      border: 1px solid rgba(200,168,75,.15);
       border-radius: 10px;
-      box-shadow: 0 0 10px rgba(255,215,0,0.6);
+      padding: 12px 16px;
+      margin: 20px 0;
+      font-size: .75rem;
+      color: var(--silver);
+      line-height: 1.5;
+    }
+
+    .anon-icon { font-size: 1.1rem; flex-shrink: 0; }
+    .anon-badge strong { color: var(--gold); }
+
+    .btn-send {
+      width: 100%;
+      padding: 18px 32px;
+      background: linear-gradient(135deg, #a8782a 0%, var(--gold) 40%, var(--gold2) 65%, #a8782a 100%);
+      background-size: 200% 200%;
+      border: none;
+      border-radius: var(--r);
+      color: #0a0800;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      cursor: none;
+      transition: transform .2s, box-shadow .3s;
+      animation: shimmer 4s ease-in-out infinite;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @keyframes shimmer {
+      0%,100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
+    }
+
+    .btn-send:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(200,168,75,.35), 0 0 60px rgba(200,168,75,.12);
+    }
+
+    .btn-send:active { transform: translateY(0); }
+    .btn-send:disabled { opacity: .5; cursor: not-allowed; transform: none; animation: none; }
+
+    .btn-send::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, transparent 40%, rgba(255,255,255,.12) 50%, transparent 60%);
+      background-size: 200% 200%;
+      animation: shine 3s ease-in-out infinite;
+    }
+
+    @keyframes shine {
+      0%,100% { background-position: -100% 0; }
+      50%      { background-position: 200% 0; }
+    }
+
+    .btn-admin-wrap { text-align: center; margin-top: 14px; }
+
+    .btn-admin {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px;
+      background: transparent;
+      border: 1px solid rgba(200,168,75,.2);
+      border-radius: 50px;
+      color: var(--silver);
+      font-family: 'Syne', sans-serif;
+      font-size: .7rem;
+      letter-spacing: .25em;
+      text-transform: uppercase;
+      cursor: none;
+      text-decoration: none;
+      transition: all .3s;
+      opacity: .55;
+    }
+
+    .btn-admin:hover {
+      border-color: rgba(200,168,75,.45);
+      color: var(--gold);
+      opacity: 1;
+      box-shadow: 0 0 20px rgba(200,168,75,.1);
+    }
+
+    .btn-admin-icon { font-size: .85rem; }
+
+    /* CONFIRMATION */
+    .confirm-overlay {
+      display: none;
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(7,7,10,.75);
+      backdrop-filter: blur(10px);
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      animation: overlayIn .4s ease forwards;
+    }
+
+    .confirm-overlay.active { display: flex; }
+
+    @keyframes overlayIn { from { opacity:0; } to { opacity:1; } }
+
+    .confirm-bubble {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid rgba(200,168,75,.3);
+      border-radius: 28px;
+      padding: 44px 40px 36px;
+      max-width: 420px;
+      width: 100%;
+      text-align: center;
+      box-shadow:
+        0 0 0 1px rgba(200,168,75,.08),
+        0 40px 100px rgba(0,0,0,.7),
+        0 0 60px rgba(200,168,75,.08);
+      animation: bubbleIn .5s cubic-bezier(.34,1.56,.64,1) forwards;
+      overflow: hidden;
+    }
+
+    @keyframes bubbleIn {
+      from { opacity:0; transform:scale(.7) translateY(30px); }
+      to   { opacity:1; transform:scale(1) translateY(0); }
+    }
+
+    .confirm-bubble::before {
+      content: '';
+      position: absolute; top: 0; left: 10%; right: 10%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .particle { position:absolute; width:4px; height:4px; background:var(--gold); border-radius:50%; opacity:0; pointer-events:none; }
+    .p1 { top:20%; left:10%;  animation:float1 3s   .2s ease-in-out infinite; }
+    .p2 { top:60%; left:5%;   animation:float2 2.5s .5s ease-in-out infinite; }
+    .p3 { top:30%; right:8%;  animation:float1 2.8s .8s ease-in-out infinite; }
+    .p4 { top:70%; right:12%; animation:float2 3.2s .3s ease-in-out infinite; }
+    .p5 { top:10%; left:50%;  animation:float1 2.6s 1s  ease-in-out infinite; }
+
+    @keyframes float1 { 0%,100%{opacity:0;transform:translateY(0) scale(1);}    50%{opacity:.6;transform:translateY(-18px) scale(1.4);} }
+    @keyframes float2 { 0%,100%{opacity:0;transform:translateY(0) scale(.8);}   50%{opacity:.4;transform:translateY(14px) scale(1.2);} }
+
+    .confirm-emoji { font-size:2.8rem; display:block; margin-bottom:16px; animation:emojiPop .6s .2s cubic-bezier(.34,1.56,.64,1) both; }
+    @keyframes emojiPop { from{transform:scale(0) rotate(-20deg);opacity:0;} to{transform:scale(1) rotate(0deg);opacity:1;} }
+
+    .confirm-title { font-family:'Playfair Display',serif; font-size:1.4rem; font-weight:700; color:var(--white); line-height:1.3; margin-bottom:10px; }
+    .confirm-title .gold { color:var(--gold); }
+
+    .confirm-sub { font-size:.82rem; color:var(--silver); line-height:1.7; opacity:.8; margin-bottom:8px; }
+
+    .confirm-whisper { font-family:'Playfair Display',serif; font-style:italic; font-size:.78rem; color:var(--gold); opacity:.65; margin-bottom:28px; display:block; }
+
+    .confirm-divider { width:40px; height:1px; background:linear-gradient(90deg,transparent,var(--border2),transparent); margin:0 auto 24px; }
+
+    .btn-ok {
+      width:100%; padding:15px 28px;
+      background:rgba(200,168,75,.1);
+      border:1px solid rgba(200,168,75,.35);
+      border-radius:var(--r);
+      color:var(--gold);
+      font-family:'Syne',sans-serif;
+      font-size:.88rem; font-weight:700;
+      letter-spacing:.18em; text-transform:uppercase;
+      cursor:none; transition:all .3s; margin-bottom:12px;
+    }
+
+    .btn-ok:hover { background:rgba(200,168,75,.18); box-shadow:0 0 30px rgba(200,168,75,.2); transform:translateY(-1px); }
+
+    .error-msg {
+      display:none;
+      background:rgba(224,85,85,.08);
+      border:1px solid rgba(224,85,85,.25);
+      border-radius:10px;
+      padding:12px 16px;
+      color:#e07070;
+      font-size:.78rem;
+      text-align:center;
+      margin-top:12px;
+      animation:fadeUp .3s forwards;
+    }
+
+    .error-msg.show { display:block; }
+
+    .site-footer {
+      position:relative; z-index:2;
+      text-align:center;
+      margin-top:36px;
+      font-size:.62rem;
+      letter-spacing:.2em;
+      text-transform:uppercase;
+      color:var(--silver);
+      opacity:.3;
+    }
+
+    .toast {
+      position:fixed; bottom:28px; left:50%;
+      transform:translateX(-50%) translateY(100px);
+      z-index:9997;
+      background:var(--surface);
+      border:1px solid rgba(200,168,75,.3);
+      border-radius:50px;
+      padding:11px 22px;
+      font-size:.78rem;
+      color:var(--gold);
+      letter-spacing:.08em;
+      transition:transform .4s cubic-bezier(.34,1.56,.64,1);
+      pointer-events:none;
+      white-space:nowrap;
+    }
+
+    .toast.show { transform:translateX(-50%) translateY(0); }
+
+    .btn-send-inner { display:flex; align-items:center; justify-content:center; gap:10px; }
+    .send-spinner {
+      display:none; width:16px; height:16px;
+      border:2px solid rgba(10,8,0,.3); border-top-color:rgba(10,8,0,.8);
+      border-radius:50%; animation:spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    @media (max-width:520px) {
+      .card { padding:28px 20px 24px; }
+      .confirm-bubble { padding:36px 24px 28px; }
+      #cur, #cur-ring { display:none; }
+      body { cursor:auto; }
+      .btn-send, .btn-ok, .btn-admin { cursor:pointer; }
+      .msg-textarea { cursor:text; }
     }
   </style>
 </head>
 <body>
-  <h1>Transforme ta photo en style premium</h1>
-  <input type="file" accept="image/*">
 
-  <div class="examples">
-    <h2>Exemples</h2>
-    <img src="https://via.placeholder.com/200x250.png?text=Exemple+1" alt="Exemple 1">
-    <img src="https://via.placeholder.com/200x250.png?text=Exemple+2" alt="Exemple 2">
+<div class="bg-grain"></div>
+<div class="bg-glow"></div>
+<div class="bg-lines"></div>
+
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<div class="toast" id="toast"></div>
+
+<!-- CONFIRMATION OVERLAY -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-bubble" id="confirmBubble">
+    <div class="particle p1"></div>
+    <div class="particle p2"></div>
+    <div class="particle p3"></div>
+    <div class="particle p4"></div>
+    <div class="particle p5"></div>
+    <span class="confirm-emoji">🕊️</span>
+    <h2 class="confirm-title">Ton message a été <span class="gold">envoyé</span></h2>
+    <p class="confirm-sub">Il ne saura jamais que c'est toi. Ton secret est en sécurité.</p>
+    <span class="confirm-whisper">✦ &nbsp; Anonyme. Pour toujours. &nbsp; ✦</span>
+    <div class="confirm-divider"></div>
+    <button class="btn-ok" onclick="closeConfirm()">✓ &nbsp; OK, c'est fait</button>
   </div>
-<script src="script.js"></script>
+</div>
+
+<!-- MAIN -->
+<main class="wrapper">
+
+  <header class="site-header">
+    <span class="logo-eyebrow">✦ Message anonyme</span>
+    <h1 class="logo">Evanns<br><span>Anonyme</span></h1>
+    <p class="logo-sub">Dis-lui ce que tu n'oses pas dire à voix haute.</p>
+    <div class="divider"></div>
+  </header>
+
+  <div class="card">
+
+    <div class="counter-pill">
+      <div class="counter-dot"></div>
+      <span id="counterText">Chargement…</span>
+    </div>
+
+    <label class="field-label" for="msgArea">✦ Ton message</label>
+    <textarea
+      id="msgArea"
+      class="msg-textarea"
+      placeholder="Dis-moi ce que tu penses vraiment… personne ne saura que c'est toi."
+      maxlength="2000"
+    ></textarea>
+    <div class="char-count" id="charCount">0 / 2000</div>
+
+    <div class="anon-badge">
+      <span class="anon-icon">🔒</span>
+      <span>Ton identité est <strong>100% protégée</strong>. Aucune donnée personnelle collectée. Ton message arrive directement.</span>
+    </div>
+
+    <button class="btn-send" id="sendBtn" onclick="sendMessage()">
+      <span class="btn-send-inner">
+        <div class="send-spinner" id="sendSpinner"></div>
+        <span id="sendLabel">✦ &nbsp; Envoyer anonymement</span>
+      </span>
+    </button>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div class="btn-admin-wrap">
+      <a href="admin.html" class="btn-admin">
+        <span class="btn-admin-icon">⚙️</span>
+        Espace admin
+      </a>
+    </div>
+
+  </div>
+
+  <footer class="site-footer">
+    © 2025 Evanns Anonyme &nbsp;·&nbsp; Confidentialité garantie
+  </footer>
+
+</main>
+
+<script>
+  // ── CONFIG ──────────────────────────────────────────
+  const WEBHOOK_URL = 'https://discord.com/api/webhooks/1497862269093285980/6lseNMk5KbD523JdBg3C_C2Up09VY-kCPkfMtTsqp6QbPs0c83B4yIcU_RJ3fd6eJcxm';
+  const BASE = 3247;
+
+  // ── CURSOR ──────────────────────────────────────────
+  const cur  = document.getElementById('cur');
+  const ring = document.getElementById('cur-ring');
+  let mx=0, my=0, rx=0, ry=0;
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cur.style.transform = `translate(${mx-5}px,${my-5}px)`;
+  });
+  (function loop() {
+    rx += (mx-rx-16)*.1;
+    ry += (my-ry-16)*.1;
+    ring.style.transform = `translate(${rx}px,${ry}px)`;
+    requestAnimationFrame(loop);
+  })();
+
+  // ── COUNTER ─────────────────────────────────────────
+  let total = parseInt(localStorage.getItem('evannsAnonCount') || '0');
+  function updateCounter() {
+    const n = BASE + total;
+    document.getElementById('counterText').textContent =
+      `${n.toLocaleString('fr-FR')} messages envoyés`;
+  }
+  updateCounter();
+
+  // ── CHAR COUNT ──────────────────────────────────────
+  const msgArea = document.getElementById('msgArea');
+  const charEl  = document.getElementById('charCount');
+  msgArea.addEventListener('input', () => {
+    const len = msgArea.value.length;
+    charEl.textContent = `${len} / 2000`;
+    charEl.classList.toggle('warn', len > 1800);
+  });
+
+  // ── TOAST ───────────────────────────────────────────
+  function showToast(msg, ms=3000) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), ms);
+  }
+
+  // ── SEND ────────────────────────────────────────────
+  async function sendMessage() {
+    const msg    = msgArea.value.trim();
+    const errEl  = document.getElementById('errorMsg');
+    const sendBtn= document.getElementById('sendBtn');
+    const spinner= document.getElementById('sendSpinner');
+    const label  = document.getElementById('sendLabel');
+
+    errEl.classList.remove('show');
+
+    if (!msg) {
+      errEl.textContent = '✦ Écris quelque chose avant d\'envoyer.';
+      errEl.classList.add('show');
+      msgArea.focus();
+      return;
+    }
+
+    if (msg.length < 3) {
+      errEl.textContent = '✦ Ton message est trop court.';
+      errEl.classList.add('show');
+      return;
+    }
+
+    sendBtn.disabled = true;
+    spinner.style.display = 'block';
+    label.textContent = 'Envoi en cours…';
+
+    const now = new Date();
+    const dateStr = now.toLocaleString('fr-FR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
+    });
+
+    const payload = {
+      username: 'Evanns Anonyme',
+      avatar_url: 'https://cdn.discordapp.com/embed/avatars/0.png',
+      embeds: [{
+        title: '🕊️ Nouveau message anonyme',
+        description: msg,
+        color: 0xC8A84B,
+        footer: { text: `Reçu le ${dateStr} • Anonyme` },
+        thumbnail: { url: 'https://cdn.discordapp.com/embed/avatars/0.png' }
+      }]
+    };
+
+    try {
+      const res = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      // Save to localStorage for admin page
+      const messages = JSON.parse(localStorage.getItem('evannsMessages') || '[]');
+      messages.unshift({ text: msg, date: dateStr, id: Date.now() });
+      if (messages.length > 200) messages.pop();
+      localStorage.setItem('evannsMessages', JSON.stringify(messages));
+
+      onSuccess();
+    } catch (err) {
+      sendBtn.disabled = false;
+      spinner.style.display = 'none';
+      label.textContent = '✦ Envoyer anonymement';
+      errEl.textContent = '⚠️ Une erreur est survenue. Réessaie dans un instant.';
+      errEl.classList.add('show');
+    }
+  }
+
+  function onSuccess() {
+    const sendBtn= document.getElementById('sendBtn');
+    const spinner= document.getElementById('sendSpinner');
+    const label  = document.getElementById('sendLabel');
+
+    sendBtn.disabled = false;
+    spinner.style.display = 'none';
+    label.textContent = '✦ Envoyer anonymement';
+
+    total++;
+    localStorage.setItem('evannsAnonCount', total);
+    updateCounter();
+
+    msgArea.value = '';
+    charEl.textContent = '0 / 2000';
+    charEl.classList.remove('warn');
+
+    showConfirm();
+  }
+
+  function showConfirm() {
+    const overlay = document.getElementById('confirmOverlay');
+    overlay.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeConfirm() {
+    const overlay = document.getElementById('confirmOverlay');
+    overlay.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('confirmOverlay').addEventListener('click', e => {
+    if (e.target === document.getElementById('confirmOverlay')) closeConfirm();
+  });
+
+  msgArea.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.ctrlKey) sendMessage();
+  });
+</script>
 </body>
 </html>
