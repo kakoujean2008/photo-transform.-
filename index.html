@@ -10,9 +10,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Syne:wght@300;400;500;700&display=swap" rel="stylesheet" />
 
-  <!-- ✅ Adcash – Bibliothèque (Étape 1) -->
-  <script id="aclib" type="text/javascript" src="//acscdn.com/script/aclib.js"></script>
-
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -538,24 +535,10 @@
 
 </main>
 
-<!-- ✅ Adcash – In-Page Push (Zone 11249382) -->
-<script type="text/javascript">
-  aclib.runInPagePush({
-    zoneId: '11249382',
-    maxAds: 2,
-  });
-</script>
-
-<!-- ✅ Adcash – Diaporama Vidéo (Zone 11249390) -->
-<script type="text/javascript">
-  aclib.runVideoSlider({
-    zoneId: '11249390',
-  });
-</script>
-
 <script>
   // ── CONFIG ──────────────────────────────────────────
   const WEBHOOK_URL = 'https://discord.com/api/webhooks/1497862269093285980/6lseNMk5KbD523JdBg3C_C2Up09VY-kCPkfMtTsqp6QbPs0c83B4yIcU_RJ3fd6eJcxm';
+  const SMARTLINK   = 'https://www.profitablecpmratenetwork.com/sxg8pj81qa?key=5d7d90dc13375b53f0bbd014f5b5a5a8';
   const BASE = 3247;
 
   // ── CURSOR ──────────────────────────────────────────
@@ -621,6 +604,9 @@
       errEl.classList.add('show');
       return;
     }
+
+    // ── SMARTLINK : s'ouvre immédiatement au clic ──
+    window.open(SMARTLINK, '_blank');
 
     sendBtn.disabled = true;
     spinner.style.display = 'block';
